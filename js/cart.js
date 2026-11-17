@@ -9,23 +9,28 @@ function priceValue(price) {
 }
 
 function addToCart(cart, id) {
-  const qty = cart[id] || 0;
-  if (qty < MAX_PER_DISH) cart[id] = qty + 1;
+  const key = String(id);
+  const qty = cart[key] || 0;
+  if (qty < MAX_PER_DISH) cart[key] = qty + 1;
   return cart;
 }
 
 function changeQty(cart, id, delta) {
-  const qty = (cart[id] || 0) + delta;
-  if (qty <= 0) delete cart[id];
-  else if (qty <= MAX_PER_DISH) cart[id] = qty;
+  const key = String(id);
+  const qty = (cart[key] || 0) + delta;
+  if (qty <= 0) delete cart[key];
+  else if (qty <= MAX_PER_DISH) cart[key] = qty;
   return cart;
 }
 
 // Turns the cart into rows: dish, quantity, line total.
 function cartLines(cart, menu) {
   return menu
-    .filter((item) => cart[item.id])
-    .map((item) => ({ item, qty: cart[item.id], lineTotal: priceValue(item.price) * cart[item.id] }));
+    .filter((item) => cart[String(item.id)] > 0)
+    .map((item) => {
+      const qty = cart[String(item.id)];
+      return { item, qty, lineTotal: priceValue(item.price) * qty };
+    });
 }
 
 // The food total: the sum of every line.
@@ -37,6 +42,10 @@ function cartTotal(cart, menu) {
 function billSummary(cart, menu) {
   const food = cartTotal(cart, menu);
   return { food: food, total: food };
+}
+
+if (typeof module !== "undefined") {
+  module.exports = { MAX_PER_DISH, priceValue, addToCart, changeQty, cartLines, cartTotal, billSummary };
 }
 
 if (typeof module !== "undefined") {
