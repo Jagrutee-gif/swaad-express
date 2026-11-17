@@ -38,14 +38,13 @@ function cartTotal(cart, menu) {
   return cartLines(cart, menu).reduce((sum, line) => sum + line.lineTotal, 0);
 }
 
-// The bill. For now: food total only. (CR2 adds GST to this function.)
+// The bill: food total + 5% GST.
 function billSummary(cart, menu) {
   const food = cartTotal(cart, menu);
-  return { food: food, total: food };
-}
-
-if (typeof module !== "undefined") {
-  module.exports = { MAX_PER_DISH, priceValue, addToCart, changeQty, cartLines, cartTotal, billSummary };
+  const gstRate = 0.05;
+  const gst = Math.round(food * gstRate * 100) / 100;
+  const total = Math.round((food + gst) * 100) / 100;
+  return { food, gstRate, gst, total };
 }
 
 if (typeof module !== "undefined") {
